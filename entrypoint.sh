@@ -76,6 +76,7 @@ node -e "
   if(!c.channels)c.channels={};
   if(!c.channels.whatsapp)c.channels.whatsapp={};
   c.channels.whatsapp.dmPolicy='open';
+  c.channels.whatsapp.allowFrom=['*'];
   if(!c.channels.whatsapp.accounts)c.channels.whatsapp.accounts={};
   if(!c.channels.whatsapp.accounts.default)c.channels.whatsapp.accounts.default={};
   c.channels.whatsapp.accounts.default.dmPolicy='open';
