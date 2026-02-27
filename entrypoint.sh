@@ -72,6 +72,14 @@ node -e "
   if(!c.gateway.http.endpoints)c.gateway.http.endpoints={};
   c.gateway.http.endpoints.chatCompletions={enabled:true};
   c.gateway.http.endpoints.responses={enabled:true};
+  // Fix WhatsApp dmPolicy - must be 'open' for auto-reply to work
+  if(!c.channels)c.channels={};
+  if(!c.channels.whatsapp)c.channels.whatsapp={};
+  c.channels.whatsapp.dmPolicy='open';
+  if(!c.channels.whatsapp.accounts)c.channels.whatsapp.accounts={};
+  if(!c.channels.whatsapp.accounts.default)c.channels.whatsapp.accounts.default={};
+  c.channels.whatsapp.accounts.default.dmPolicy='open';
+  c.channels.whatsapp.accounts.default.allowFrom=['*'];
   fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
   console.log('Patched config:',JSON.stringify(c,null,2));
 "
