@@ -25,7 +25,8 @@ cat > "$CONFIG_FILE" << 'EOF'
   "channels": {
     "whatsapp": {
       "enabled": true,
-      "dmPolicy": "open"
+      "dmPolicy": "open",
+      "allowFrom": ["*"]
     },
     "telegram": {
       "enabled": true
