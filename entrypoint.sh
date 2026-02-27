@@ -46,23 +46,32 @@ EOF
 chown node:node "$CONFIG_FILE"
 else
 echo "Config exists, preserving..."
-# Patch: ensure dangerouslyDisableDeviceAuth is set on existing configs
-if ! node -e "const c=JSON.parse(require('fs').readFileSync('$CONFIG_FILE'));process.exit(c.gateway?.controlUi?.dangerouslyDisableDeviceAuth?0:1)" 2>/dev/null; then
-  echo "Patching config: adding dangerouslyDisableDeviceAuth..."
-  node -e "
-    const fs=require('fs');
-    const c=JSON.parse(fs.readFileSync('$CONFIG_FILE'));
-    if(!c.gateway)c.gateway={};
-    if(!c.gateway.controlUi)c.gateway.controlUi={};
-    c.gateway.controlUi.dangerouslyDisableDeviceAuth=true;
-    if(!c.agents)c.agents={};
-    if(!c.agents.defaults)c.agents.defaults={};
-    if(!c.agents.defaults.model)c.agents.defaults.model={};
-    c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4-5-20251001';
-    fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
-  "
 fi
+
+# Always patch config to fix known issues
+echo "Patching config..."
+node -e "
+  const fs=require('fs');
+  const c=JSON.parse(fs.readFileSync('$CONFIG_FILE'));
+  // Remove gateway.token - causes bad gateway when invalid/stale
+  if(c.gateway && c.gateway.token) delete c.gateway.token;
+  // Ensure controlUi settings
+  if(!c.gateway)c.gateway={};
+  if(!c.gateway.controlUi)c.gateway.controlUi={};
+  c.gateway.controlUi.dangerouslyDisableDeviceAuth=true;
+  // Ensure model is haiku 4.5
+  if(!c.agents)c.agents={};
+  if(!c.agents.defaults)c.agents.defaults={};
+  if(!c.agents.defaults.model)c.agents.defaults.model={};
+  c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4-5-20251001';
+  fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
+"
+
+# Generate gateway token via env if not already set (avoids config-based token issues)
+if [ -z "$OPENCLAW_GATEWAY_TOKEN" ]; then
+  export OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+  echo "Generated gateway token via env var"
 fi
 
 # Drop to node user and start gateway
-exec su -s /bin/bash node -c "cd /app && exec node dist/index.js gateway --bind lan --port 18789"
+exec su -s /bin/bash node -c "export OPENCLAW_GATEWAY_TOKEN='$OPENCLAW_GATEWAY_TOKEN' && cd /app && exec node dist/index.js gateway --bind lan --port 18789"
