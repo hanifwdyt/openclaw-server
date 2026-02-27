@@ -16,9 +16,9 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "mode": "local",
     "bind": "lan",
     "port": 18789,
-    "password": "openclaw2026",
     "controlUi": {
-      "allowedOrigins": ["https://openclaw.hanif.app", "http://openclaw.hanif.app"]
+      "allowedOrigins": ["https://openclaw.hanif.app", "http://openclaw.hanif.app"],
+      "allowInsecureAuth": true
     }
   },
   "agents": {
@@ -32,10 +32,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
 EOF
   chown node:node "$CONFIG_FILE"
 else
-  # Patch existing config to add password if missing
-  if ! grep -q '"password"' "$CONFIG_FILE"; then
-    echo "Patching config with password..."
-    sed -i 's/"mode": "local"/"mode": "local",\n    "password": "openclaw2026"/' "$CONFIG_FILE"
+  # Patch existing config: add allowInsecureAuth if missing
+  if ! grep -q '"allowInsecureAuth"' "$CONFIG_FILE"; then
+    echo "Patching config with allowInsecureAuth..."
+    sed -i 's/"allowedOrigins"/"allowInsecureAuth": true,\n      "allowedOrigins"/' "$CONFIG_FILE"
   fi
 fi
 
