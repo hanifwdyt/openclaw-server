@@ -8,8 +8,9 @@ CONFIG_FILE="$CONFIG_DIR/openclaw.json"
 chown -R node:node "$CONFIG_DIR" 2>/dev/null || true
 mkdir -p "$CONFIG_DIR/workspace"
 
-# Always write clean config (MVP - managed by image, volume keeps other state)
-echo "Writing config..."
+# Only write config if it doesn't exist (preserve persistent state)
+if [ ! -f "$CONFIG_FILE" ]; then
+echo "No config found, creating initial config..."
 cat > "$CONFIG_FILE" << 'EOF'
 {
   "gateway": {
@@ -42,6 +43,9 @@ cat > "$CONFIG_FILE" << 'EOF'
 }
 EOF
 chown node:node "$CONFIG_FILE"
+else
+echo "Config exists, preserving..."
+fi
 
 # Drop to node user and start gateway
 exec su -s /bin/bash node -c "cd /app && exec node dist/index.js gateway --bind lan --port 18789"
