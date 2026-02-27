@@ -55,8 +55,11 @@ node -e "
   const c=JSON.parse(fs.readFileSync('$CONFIG_FILE'));
   // Remove gateway.token - causes bad gateway when invalid/stale
   if(c.gateway && c.gateway.token) delete c.gateway.token;
-  // Ensure controlUi settings
+  // Set auth mode to token so internal agent authenticates via OPENCLAW_GATEWAY_TOKEN env
   if(!c.gateway)c.gateway={};
+  if(!c.gateway.auth)c.gateway.auth={};
+  c.gateway.auth.mode='token';
+  // Ensure controlUi settings
   if(!c.gateway.controlUi)c.gateway.controlUi={};
   c.gateway.controlUi.dangerouslyDisableDeviceAuth=true;
   // Ensure model is haiku 4.5
