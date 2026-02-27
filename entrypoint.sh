@@ -22,4 +22,8 @@ EOF
 fi
 
 echo "Starting OpenClaw gateway..."
-exec node dist/index.js gateway --bind lan --port 18789
+echo "Working dir: $(pwd)"
+echo "Files: $(ls dist/index.js 2>/dev/null && echo 'found' || echo 'not found')"
+
+# Use openclaw CLI (npm global binary) instead of node dist/index.js
+exec openclaw gateway --bind lan --port 18789
