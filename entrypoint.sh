@@ -8,6 +8,10 @@ CONFIG_FILE="$CONFIG_DIR/openclaw.json"
 chown -R node:node "$CONFIG_DIR" 2>/dev/null || true
 mkdir -p "$CONFIG_DIR/workspace"
 
+# Symlink so root and node share the same openclaw config/creds
+# This way `openclaw channels login` works from either user
+ln -sfn "$CONFIG_DIR" /root/.openclaw
+
 # Only write config if it doesn't exist (preserve persistent state)
 if [ ! -f "$CONFIG_FILE" ]; then
 echo "No config found, creating initial config..."
