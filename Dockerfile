@@ -17,6 +17,9 @@ RUN mkdir -p /home/node/.openclaw/workspace \
 USER node
 WORKDIR /home/node
 
+# Create minimal config via entrypoint script
+COPY --chown=node:node entrypoint.sh /home/node/entrypoint.sh
+
 EXPOSE 18789
 
-CMD ["openclaw", "gateway", "--bind", "lan", "--port", "18789"]
+ENTRYPOINT ["/home/node/entrypoint.sh"]
