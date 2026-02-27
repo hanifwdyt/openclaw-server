@@ -37,7 +37,7 @@ cat > "$CONFIG_FILE" << 'EOF'
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/anthropic/claude-sonnet-4"
+        "primary": "openrouter/anthropic/claude-haiku-4-5-20251001"
       }
     }
   }
@@ -55,6 +55,10 @@ if ! node -e "const c=JSON.parse(require('fs').readFileSync('$CONFIG_FILE'));pro
     if(!c.gateway)c.gateway={};
     if(!c.gateway.controlUi)c.gateway.controlUi={};
     c.gateway.controlUi.dangerouslyDisableDeviceAuth=true;
+    if(!c.agents)c.agents={};
+    if(!c.agents.defaults)c.agents.defaults={};
+    if(!c.agents.defaults.model)c.agents.defaults.model={};
+    c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4-5-20251001';
     fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
   "
 fi
