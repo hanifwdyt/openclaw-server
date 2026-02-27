@@ -16,6 +16,7 @@ cat > "$CONFIG_FILE" << 'EOF'
     "mode": "local",
     "bind": "lan",
     "port": 18789,
+    "trustedProxies": ["0.0.0.0/0"],
     "controlUi": {
       "allowedOrigins": ["https://openclaw.hanif.app", "http://openclaw.hanif.app"],
       "allowInsecureAuth": true
