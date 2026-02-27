@@ -22,4 +22,4 @@ EOF
 fi
 
 echo "Starting OpenClaw gateway..."
-exec openclaw gateway --bind lan --port 18789
+exec node dist/index.js gateway --bind lan --port 18789
