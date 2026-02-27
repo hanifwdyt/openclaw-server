@@ -37,7 +37,7 @@ cat > "$CONFIG_FILE" << 'EOF'
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/anthropic/claude-haiku-4-5-20251001"
+        "primary": "openrouter/anthropic/claude-haiku-4.5"
       }
     }
   }
@@ -63,7 +63,7 @@ node -e "
   if(!c.agents)c.agents={};
   if(!c.agents.defaults)c.agents.defaults={};
   if(!c.agents.defaults.model)c.agents.defaults.model={};
-  c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4-5-20251001';
+  c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4.5';
   fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
 "
 
