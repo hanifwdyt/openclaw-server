@@ -64,7 +64,13 @@ node -e "
   if(!c.agents.defaults)c.agents.defaults={};
   if(!c.agents.defaults.model)c.agents.defaults.model={};
   c.agents.defaults.model.primary='openrouter/anthropic/claude-haiku-4.5';
+  // Enable HTTP API for debugging
+  if(!c.gateway.http)c.gateway.http={};
+  if(!c.gateway.http.endpoints)c.gateway.http.endpoints={};
+  c.gateway.http.endpoints.chatCompletions={enabled:true};
+  c.gateway.http.endpoints.responses={enabled:true};
   fs.writeFileSync('$CONFIG_FILE',JSON.stringify(c,null,2));
+  console.log('Patched config:',JSON.stringify(c,null,2));
 "
 
 # Generate gateway token via env if not already set (avoids config-based token issues)
@@ -74,4 +80,6 @@ if [ -z "$OPENCLAW_GATEWAY_TOKEN" ]; then
 fi
 
 # Drop to node user and start gateway
-exec su -s /bin/bash node -c "export OPENCLAW_GATEWAY_TOKEN='$OPENCLAW_GATEWAY_TOKEN' && cd /app && exec node dist/index.js gateway --bind lan --port 18789"
+echo "OPENCLAW_GATEWAY_TOKEN is set: $([ -n "$OPENCLAW_GATEWAY_TOKEN" ] && echo 'yes' || echo 'no')"
+echo "OPENROUTER_API_KEY is set: $([ -n "$OPENROUTER_API_KEY" ] && echo 'yes' || echo 'no')"
+exec su -s /bin/bash node -c "export OPENCLAW_GATEWAY_TOKEN='$OPENCLAW_GATEWAY_TOKEN' && export OPENROUTER_API_KEY='$OPENROUTER_API_KEY' && cd /app && exec node dist/index.js gateway --bind lan --port 18789"
