@@ -1,7 +1,10 @@
 FROM ghcr.io/openclaw/openclaw:latest
 
+# Create minimal config so gateway starts without onboarding
+# Config will be overwritten by volume mount if persistent storage is set
+RUN mkdir -p /home/node/.openclaw/workspace && \
+    echo '{"gateway":{"mode":"local","bind":"lan","port":18789},"agent":{"model":"openrouter/anthropic/claude-sonnet-4"}}' > /home/node/.openclaw/openclaw.json
+
 EXPOSE 18789
 
-# Use the official image's WORKDIR (where dist/index.js lives)
-# Config is created via env vars and will persist in mounted volume
-CMD ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789", "--allow-unconfigured"]
+CMD ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
