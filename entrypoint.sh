@@ -82,6 +82,37 @@ if [ -z "$OPENCLAW_GATEWAY_TOKEN" ]; then
   echo "Generated gateway token via env var"
 fi
 
+# Auto-pair the local device identity with the gateway
+# Without this, internal agent gets "pairing required" (1008) on ws://127.0.0.1
+IDENTITY_FILE="$CONFIG_DIR/identity/device.json"
+PAIRED_FILE="$CONFIG_DIR/devices/paired.json"
+if [ -f "$IDENTITY_FILE" ]; then
+  mkdir -p "$CONFIG_DIR/devices"
+  [ -f "$PAIRED_FILE" ] || echo '{}' > "$PAIRED_FILE"
+  node -e "
+    const fs=require('fs');
+    const device=JSON.parse(fs.readFileSync('$IDENTITY_FILE'));
+    const paired=JSON.parse(fs.readFileSync('$PAIRED_FILE'));
+    if(!paired[device.deviceId]){
+      const crypto=require('crypto');
+    const keyObj=crypto.createPublicKey(device.publicKeyPem);
+    const rawKey=keyObj.export({type:'spki',format:'der'}).subarray(-32);
+    const b64url=rawKey.toString('base64url');
+    paired[device.deviceId]={
+        deviceId:device.deviceId,publicKey:b64url,
+        platform:'linux',clientId:'internal-agent',clientMode:'cli',
+        role:'operator',roles:['operator'],
+        scopes:['operator.admin','operator.read','operator.write','operator.approvals','operator.pairing'],
+        approvedScopes:['operator.admin','operator.read','operator.write','operator.approvals','operator.pairing'],
+        tokens:{},createdAtMs:Date.now(),approvedAtMs:Date.now()
+      };
+      fs.writeFileSync('$PAIRED_FILE',JSON.stringify(paired,null,2));
+      console.log('Auto-paired device:',device.deviceId);
+    } else { console.log('Device already paired'); }
+  "
+  chown node:node "$PAIRED_FILE"
+fi
+
 # Drop to node user and start gateway
 echo "OPENCLAW_GATEWAY_TOKEN is set: $([ -n "$OPENCLAW_GATEWAY_TOKEN" ] && echo 'yes' || echo 'no')"
 echo "OPENROUTER_API_KEY is set: $([ -n "$OPENROUTER_API_KEY" ] && echo 'yes' || echo 'no')"
