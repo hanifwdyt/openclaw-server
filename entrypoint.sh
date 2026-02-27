@@ -16,6 +16,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "mode": "local",
     "bind": "lan",
     "port": 18789,
+    "password": "openclaw2026",
     "controlUi": {
       "allowedOrigins": ["https://openclaw.hanif.app", "http://openclaw.hanif.app"]
     }
@@ -30,6 +31,12 @@ if [ ! -f "$CONFIG_FILE" ]; then
 }
 EOF
   chown node:node "$CONFIG_FILE"
+else
+  # Patch existing config to add password if missing
+  if ! grep -q '"password"' "$CONFIG_FILE"; then
+    echo "Patching config with password..."
+    sed -i 's/"mode": "local"/"mode": "local",\n    "password": "openclaw2026"/' "$CONFIG_FILE"
+  fi
 fi
 
 # Drop to node user and start gateway
