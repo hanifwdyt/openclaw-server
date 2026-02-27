@@ -22,6 +22,15 @@ cat > "$CONFIG_FILE" << 'EOF'
       "allowInsecureAuth": true
     }
   },
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "dmPolicy": "open"
+    },
+    "telegram": {
+      "enabled": true
+    }
+  },
   "agents": {
     "defaults": {
       "model": {
