@@ -1,10 +1,6 @@
 FROM ghcr.io/openclaw/openclaw:latest
 
-# Create minimal config so gateway starts without onboarding
-# Config will be overwritten by volume mount if persistent storage is set
-RUN mkdir -p /home/node/.openclaw/workspace && \
-    echo '{"gateway":{"mode":"local","bind":"lan","port":18789},"agent":{"model":"openrouter/anthropic/claude-sonnet-4"}}' > /home/node/.openclaw/openclaw.json
-
 EXPOSE 18789
 
-CMD ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
+# Debug: keep container alive so we can inspect
+CMD ["sh", "-c", "echo '=== WORKDIR ===' && pwd && echo '=== LS ===' && ls -la && echo '=== HOME ===' && echo $HOME && echo '=== WHOAMI ===' && whoami && echo '=== CONFIG DIR ===' && ls -la /home/node/.openclaw/ 2>/dev/null || echo 'no .openclaw dir' && echo '=== OPENCLAW BIN ===' && which openclaw 2>/dev/null || echo 'no openclaw bin' && echo '=== NODE MODULES BIN ===' && ls /usr/local/bin/openclaw 2>/dev/null || echo 'not in /usr/local/bin' && echo '=== STAYING ALIVE ===' && tail -f /dev/null"]
